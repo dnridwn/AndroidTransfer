@@ -3,7 +3,6 @@ package libmtp
 import (
 	"AndroidTransfer/internal/mtp"
 	"context"
-	"errors"
 	"sync"
 
 	mtpdriver "github.com/hanwen/go-mtpfs/mtp"
@@ -93,7 +92,7 @@ func (d *Device) OpenSession(ctx context.Context) error {
 	defer d.mu.Unlock()
 
 	if d.isSessionOpen {
-		return errors.New("session is already open")
+		return nil
 	}
 
 	if err := d.h.OpenSession(); err != nil {
