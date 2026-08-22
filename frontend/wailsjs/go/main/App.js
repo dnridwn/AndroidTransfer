@@ -5,3 +5,7 @@
 export function GetDevices() {
   return window['go']['main']['App']['GetDevices']();
 }
+
+export function GetStorages(arg1) {
+  return window['go']['main']['App']['GetStorages'](arg1);
+}
