@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/* disable user selection */
+html,
+body {
+    -webkit-user-select: none;
+    user-select: none;
+}

@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+internal
+wailsjs
+*.min.js
+!**/*.js
+!**/*.jsx
+!**/*.ts
+!**/*.tsx
+!**/*.json
+!**/*.html
+!**/*.css
+!**/*.scss
