@@ -1,7 +1,9 @@
 package main
 
 import (
+	"AndroidTransfer/internal/mtp/libmtp"
 	"embed"
+	"sync"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -12,14 +14,19 @@ import (
 var assets embed.FS
 
 func main() {
+	// Create an mtp driver instance
+	usbCommMutex := sync.Mutex{}
+	mtpdriver := libmtp.NewLibMTP(&usbCommMutex)
+
 	// Create an instance of the app structure
-	app := NewApp()
+	app := NewApp(mtpdriver)
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "AndroidTransfer",
-		Width:  1024,
-		Height: 768,
+		Title:         "AndroidTransfer",
+		Width:         1024,
+		Height:        768,
+		DisableResize: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

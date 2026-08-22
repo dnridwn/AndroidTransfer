@@ -3,3 +3,5 @@
 import {main} from '../models';
 
 export function GetDevices():Promise<Array<main.DeviceOutput>>;
+
+export function GetStorages(arg1:string):Promise<Array<main.StorageOutput>>;
