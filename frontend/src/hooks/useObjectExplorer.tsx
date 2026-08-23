@@ -15,8 +15,6 @@ type ObjectExplorerContextType = {
     pathStack: PathStackItem[];
     loading: boolean;
     objects: Object[];
-    focusedObject: Object | null;
-    focusObject: (object: Object | null) => void;
     openPath: (pathStackItem: PathStackItem) => void;
     openStorage: (device: Device, storage: Storage) => void;
     loadObjects: (parentId: number) => Promise<void>;
@@ -30,7 +28,6 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
     const [selectedStorage, setSelectedStorage] = useState<Storage | null>(null);
     const [objects, setObjects] = useState<Object[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [focusedObject, setFocusedObject] = useState<Object | null>(null);
     const [pathStack, setPathStack] = useState<PathStackItem[]>([]);
 
     const loadObjects = async (parentId: number) => {
@@ -120,13 +117,9 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
                 loading,
                 objects,
                 openPath,
-                focusedObject,
                 openStorage: (device: Device, storage: Storage) => {
                     setSelectedDevice(device);
                     setSelectedStorage(storage);
-                },
-                focusObject: (object: Object | null) => {
-                    setFocusedObject(object);
                 },
                 loadObjects,
                 deleteObject,

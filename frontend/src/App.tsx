@@ -7,6 +7,7 @@ import { LoadingComponent } from "./components/Loading";
 import { ObjectComponent } from "./components/Object";
 import { ModalComponent } from "./components/Modal";
 import { formatByteHumanReadable } from "./utils/format";
+import { Object } from "./types/object";
 
 function App() {
     return (
@@ -63,11 +64,9 @@ const MainView = () => {
         openPath,
         objects,
         loading,
-        focusedObject,
-        focusObject,
         deleteObject,
     } = useObjectExplorer();
-
+    const [focusObject, setFocusObject] = useState<Object | null>(null);
     const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState(false);
 
     return (
@@ -106,7 +105,7 @@ const MainView = () => {
                                     }}
                                     onActionClick={(action, object) => {
                                         if (action === "INFO") {
-                                            focusObject(object);
+                                            setFocusObject(object);
                                             setModalObjectInfoVisible(true);
                                         }
 
@@ -127,7 +126,7 @@ const MainView = () => {
                             </div>
                         }
                         onClose={() => {
-                            focusObject(null);
+                            setFocusObject(null);
                             setModalObjectInfoVisible(false);
                         }}
                     >
@@ -136,20 +135,18 @@ const MainView = () => {
                                 <tr>
                                     <td className="p-1">Name</td>
                                     <td className="p-1">:</td>
-                                    <td className="p-1">{focusedObject?.name}</td>
+                                    <td className="p-1">{focusObject?.name}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-1">Type</td>
                                     <td className="p-1">:</td>
-                                    <td className="p-1">{focusedObject?.format}</td>
+                                    <td className="p-1">{focusObject?.format}</td>
                                 </tr>
                                 <tr>
                                     <td className="p-1">Size</td>
                                     <td className="p-1">:</td>
                                     <td className="p-1">
-                                        {formatByteHumanReadable(
-                                            focusedObject?.size || 0
-                                        )}
+                                        {formatByteHumanReadable(focusObject?.size || 0)}
                                     </td>
                                 </tr>
                                 <tr>
@@ -157,7 +154,7 @@ const MainView = () => {
                                     <td className="p-1">:</td>
                                     <td className="p-1">
                                         {new Date(
-                                            focusedObject?.modification_date || ""
+                                            focusObject?.modification_date || ""
                                         ).toLocaleString()}
                                     </td>
                                 </tr>
