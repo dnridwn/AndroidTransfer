@@ -69,3 +69,30 @@ func (a *App) GetStorages(deviceSerialNumber string) ([]StorageOutput, error) {
 
 	return storagesOutput, nil
 }
+
+func (a *App) GetObjects(deviceSerialNumber string, storageID, parentID uint32) ([]ObjectOutput, error) {
+	device, ok := a.devicePool[deviceSerialNumber]
+	if !ok {
+		return nil, errors.New("no device found")
+	}
+
+	objects, err := device.GetObjects(a.ctx, storageID, parentID)
+	if err != nil {
+		return nil, err
+	}
+
+	objectsOutput := make([]ObjectOutput, len(objects))
+	for i, object := range objects {
+		objectsOutput[i] = ObjectOutput{
+			ID:                 object.ID(),
+			DeviceSerialNumber: object.DeviceSerialNumber(),
+			StorageID:          object.StorageID(),
+			Name:               object.Name(),
+			Format:             object.Format(),
+			Size:               object.Size(),
+			ModificationDate:   object.ModificationDate(),
+		}
+	}
+
+	return objectsOutput, nil
+}

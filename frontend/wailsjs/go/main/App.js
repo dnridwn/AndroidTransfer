@@ -6,6 +6,10 @@ export function GetDevices() {
   return window['go']['main']['App']['GetDevices']();
 }
 
+export function GetObjects(arg1, arg2, arg3) {
+  return window['go']['main']['App']['GetObjects'](arg1, arg2, arg3);
+}
+
 export function GetStorages(arg1) {
   return window['go']['main']['App']['GetStorages'](arg1);
 }
