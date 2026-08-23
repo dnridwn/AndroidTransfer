@@ -2,7 +2,10 @@ package libmtp
 
 import (
 	"AndroidTransfer/internal/mtp"
+	"cmp"
 	"context"
+	"slices"
+	"strings"
 	"sync"
 
 	mtpdriver "github.com/hanwen/go-mtpfs/mtp"
@@ -141,4 +144,36 @@ func (d *Device) GetStorages(ctx context.Context) ([]mtp.MTPStorage, error) {
 	}
 
 	return storages, nil
+}
+
+func (d *Device) GetObjects(ctx context.Context, storageID, parentID uint32) ([]mtp.MTPObject, error) {
+	_ = d.OpenSession(ctx)
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	if parentID == 0 {
+		parentID = mtpdriver.GOH_ROOT_PARENT
+	}
+
+	var objectIds mtpdriver.Uint32Array
+	if err := d.h.GetObjectHandles(storageID, mtpdriver.GOH_ALL_ASSOCS, parentID, &objectIds); err != nil {
+		return nil, err
+	}
+
+	objects := make([]mtp.MTPObject, len(objectIds.Values))
+	for i, objectID := range objectIds.Values {
+		object, err := NewObject(d.h, d.mu, d.serialNumber, storageID, objectID)
+		if err != nil {
+			return nil, err
+		}
+
+		objects[i] = object
+	}
+
+	slices.SortFunc(objects, func(a, b mtp.MTPObject) int {
+		return cmp.Compare(strings.ToLower(a.Name()), strings.ToLower(b.Name()))
+	})
+
+	return objects, nil
 }
