@@ -9,4 +9,5 @@ type MTPDevice interface {
 	IsSessionOpen() bool
 	GetStorages(ctx context.Context) ([]MTPStorage, error)
 	GetObjects(ctx context.Context, storageID, parentID uint32) ([]MTPObject, error)
+	DeleteObject(ctx context.Context, objectID uint32) error
 }

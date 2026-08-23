@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Device } from "../types/device";
-import { getDeviceList, getStorageList } from "../api/backend";
+import { handleGetDeviceList, handleGetStorageList } from "../api/backend";
 
 type DeviceListContextType = {
     devices: Device[];
@@ -14,9 +14,9 @@ export function DeviceListProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         (async () => {
             try {
-                const deviceList = await getDeviceList();
+                const deviceList = await handleGetDeviceList();
                 for (let device of deviceList) {
-                    const storages = await getStorageList(device.serial_number);
+                    const storages = await handleGetStorageList(device.serial_number);
                     device.storages = storages;
                 }
                 setDevices(deviceList);

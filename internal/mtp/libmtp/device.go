@@ -177,3 +177,12 @@ func (d *Device) GetObjects(ctx context.Context, storageID, parentID uint32) ([]
 
 	return objects, nil
 }
+
+func (d *Device) DeleteObject(ctx context.Context, objectID uint32) error {
+	_ = d.OpenSession(ctx)
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	return d.h.DeleteObject(objectID)
+}

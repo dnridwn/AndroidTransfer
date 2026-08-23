@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Device } from "../types/device";
 import { Object } from "../types/object";
 import { Storage } from "../types/storage";
-import { getObjectList } from "../api/backend";
+import { handleDeleteObject, handleGetObjectList } from "../api/backend";
 
 interface PathStackItem {
     key: number;
@@ -13,13 +13,14 @@ type ObjectExplorerContextType = {
     activeDevice: Device | null;
     activeStorage: Storage | null;
     pathStack: PathStackItem[];
-    loadingObjects: boolean;
+    loading: boolean;
     objects: Object[];
     focusedObject: Object | null;
     focusObject: (object: Object | null) => void;
     openPath: (pathStackItem: PathStackItem) => void;
     openStorage: (device: Device, storage: Storage) => void;
     loadObjects: (parentId: number) => Promise<void>;
+    deleteObject: (objectID: number) => void;
 };
 
 const ObjectExplorerContext = createContext<ObjectExplorerContextType | null>(null);
@@ -28,13 +29,13 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
     const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
     const [selectedStorage, setSelectedStorage] = useState<Storage | null>(null);
     const [objects, setObjects] = useState<Object[]>([]);
-    const [loadingObjects, setLoadingObjects] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [focusedObject, setFocusedObject] = useState<Object | null>(null);
     const [pathStack, setPathStack] = useState<PathStackItem[]>([]);
 
     const loadObjects = async (parentId: number) => {
-        if (loadingObjects) {
-            throw new Error("Already loading objects");
+        if (loading) {
+            throw new Error("There is running process");
         }
 
         if (!selectedDevice || !selectedStorage) {
@@ -42,8 +43,8 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
         }
 
         try {
-            setLoadingObjects(true);
-            const objects = await getObjectList(
+            setLoading(true);
+            const objects = await handleGetObjectList(
                 selectedDevice.serial_number,
                 selectedStorage.id,
                 parentId
@@ -52,7 +53,26 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
         } catch (e) {
             console.error("Error loading objects:", e);
         } finally {
-            setLoadingObjects(false);
+            setLoading(false);
+        }
+    };
+
+    const deleteObject = async (objectId: number) => {
+        if (loading) {
+            throw new Error("There is running process");
+        }
+
+        if (!selectedDevice || !selectedStorage) {
+            throw new Error("Selected device or storage is not set");
+        }
+
+        try {
+            await handleDeleteObject(selectedDevice.serial_number, objectId);
+            loadObjects(pathStack[pathStack.length - 1].key);
+        } catch (e) {
+            console.error("Error deleting object:", e);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -97,7 +117,7 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
                 activeDevice: selectedDevice,
                 activeStorage: selectedStorage,
                 pathStack,
-                loadingObjects,
+                loading,
                 objects,
                 openPath,
                 focusedObject,
@@ -109,6 +129,7 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
                     setFocusedObject(object);
                 },
                 loadObjects,
+                deleteObject,
             }}
         >
             {children}

@@ -1,9 +1,14 @@
-import { GetDevices, GetStorages, GetObjects } from "../../wailsjs/go/main/App";
+import {
+    GetDevices,
+    GetStorages,
+    GetObjects,
+    DeleteObject,
+} from "../../wailsjs/go/main/App";
 import { Device } from "../types/device";
 import { Storage } from "../types/storage";
 import { Object } from "../types/object";
 
-export const getDeviceList = async (): Promise<Device[]> => {
+export const handleGetDeviceList = async (): Promise<Device[]> => {
     try {
         const devices = await GetDevices();
         return (devices || []).map((device) => {
@@ -24,7 +29,9 @@ export const getDeviceList = async (): Promise<Device[]> => {
     }
 };
 
-export const getStorageList = async (deviceSerialNumber: string): Promise<Storage[]> => {
+export const handleGetStorageList = async (
+    deviceSerialNumber: string
+): Promise<Storage[]> => {
     try {
         const storages = await GetStorages(deviceSerialNumber);
         return (storages || []).map((storage) => {
@@ -47,7 +54,7 @@ export const getStorageList = async (deviceSerialNumber: string): Promise<Storag
     }
 };
 
-export const getObjectList = async (
+export const handleGetObjectList = async (
     deviceSerialNumber: string,
     storageId: number,
     parentId: number
@@ -68,6 +75,23 @@ export const getObjectList = async (
     } catch (e: unknown) {
         if (e instanceof Error) {
             throw new Error("Failed to get object list: " + e.message);
+        } else {
+            throw new Error("An unexpected error occured: ", {
+                cause: e,
+            });
+        }
+    }
+};
+
+export const handleDeleteObject = async (
+    deviceSerialNumber: string,
+    objectID: number
+) => {
+    try {
+        await DeleteObject(deviceSerialNumber, objectID);
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error("Failed to delete object: " + e.message);
         } else {
             throw new Error("An unexpected error occured: ", {
                 cause: e,

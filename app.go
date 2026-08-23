@@ -96,3 +96,12 @@ func (a *App) GetObjects(deviceSerialNumber string, storageID, parentID uint32) 
 
 	return objectsOutput, nil
 }
+
+func (a *App) DeleteObject(deviceSerialNumber string, objectID uint32) error {
+	device, ok := a.devicePool[deviceSerialNumber]
+	if !ok {
+		return errors.New("no device found")
+	}
+
+	return device.DeleteObject(a.ctx, objectID)
+}

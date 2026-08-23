@@ -62,9 +62,10 @@ const MainView = () => {
         pathStack,
         openPath,
         objects,
-        loadingObjects,
+        loading,
         focusedObject,
         focusObject,
+        deleteObject,
     } = useObjectExplorer();
 
     const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState(false);
@@ -88,9 +89,9 @@ const MainView = () => {
                         />
                     </div>
 
-                    {loadingObjects && <LoadingComponent />}
+                    {loading && <LoadingComponent />}
 
-                    {!loadingObjects && (
+                    {!loading && (
                         <div className="grid grid-cols-5 gap-2 p-3">
                             {objects.map((object) => (
                                 <ObjectComponent
@@ -107,6 +108,10 @@ const MainView = () => {
                                         if (action === "INFO") {
                                             focusObject(object);
                                             setModalObjectInfoVisible(true);
+                                        }
+
+                                        if (action === "DELETE") {
+                                            deleteObject(object.id);
                                         }
                                     }}
                                 />
