@@ -1,4 +1,4 @@
-import { HardDrive, Info, Laptop } from "lucide-react";
+import { CircleQuestionMark, HardDrive, Info, Laptop } from "lucide-react";
 import { DeviceListProvider, useDeviceList } from "./hooks/useDeviceList";
 import { ObjectExplorerProvider, useObjectExplorer } from "./hooks/useObjectExplorer";
 import { useState } from "react";
@@ -68,6 +68,7 @@ const MainView = () => {
     } = useObjectExplorer();
     const [focusObject, setFocusObject] = useState<Object | null>(null);
     const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState(false);
+    const [modalDeleteObjectVisible, setModalDeleteObjectVisible] = useState(false);
 
     return (
         <div className="w-[calc(100%-300px)] h-full overflow-y-scroll bg-white">
@@ -110,7 +111,8 @@ const MainView = () => {
                                         }
 
                                         if (action === "DELETE") {
-                                            deleteObject(object.id);
+                                            setFocusObject(object);
+                                            setModalDeleteObjectVisible(true);
                                         }
                                     }}
                                 />
@@ -121,7 +123,7 @@ const MainView = () => {
                     <ModalComponent
                         visible={modalObjectInfoVisible}
                         title={
-                            <div className="flex justify-center items-center gap-2">
+                            <div className="flex justify-center items-center gap-2 text-sm">
                                 <Info size={18} /> Info
                             </div>
                         }
@@ -160,6 +162,46 @@ const MainView = () => {
                                 </tr>
                             </tbody>
                         </table>
+                    </ModalComponent>
+
+                    <ModalComponent
+                        visible={modalDeleteObjectVisible}
+                        title={
+                            <div className="flex justify-center items-center gap-2 text-sm">
+                                <CircleQuestionMark size={18} /> Delete Confirmation
+                            </div>
+                        }
+                        onClose={() => {
+                            setFocusObject(null);
+                            setModalDeleteObjectVisible(false);
+                        }}
+                    >
+                        <div className="mb-5">
+                            <p className="text-sm">
+                                Are you sure want to delete{" "}
+                                <span className="font-bold">{focusObject?.name}</span>?
+                            </p>
+                        </div>
+                        <div className="flex justify-end items-center gap-2">
+                            <button
+                                className="text-sm py-1 px-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300"
+                                onClick={() => {
+                                    setFocusObject(null);
+                                    setModalDeleteObjectVisible(false);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="text-sm py-1 px-2 rounded-md cursor-pointer bg-red-600 text-white hover:bg-red-700"
+                                onClick={() => {
+                                    focusObject && deleteObject(focusObject.id);
+                                    setModalDeleteObjectVisible(false);
+                                }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </ModalComponent>
                 </>
             )}
