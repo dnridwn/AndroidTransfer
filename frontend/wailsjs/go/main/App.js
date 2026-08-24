@@ -17,3 +17,7 @@ export function GetObjects(arg1, arg2, arg3) {
 export function GetStorages(arg1) {
   return window['go']['main']['App']['GetStorages'](arg1);
 }
+
+export function RenameObject(arg1, arg2, arg3) {
+  return window['go']['main']['App']['RenameObject'](arg1, arg2, arg3);
+}

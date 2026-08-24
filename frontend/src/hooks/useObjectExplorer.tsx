@@ -2,7 +2,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Device } from "../types/device";
 import { Object } from "../types/object";
 import { Storage } from "../types/storage";
-import { handleDeleteObject, handleGetObjectList } from "../api/backend";
+import {
+    handleDeleteObject,
+    handleGetObjectList,
+    handleRenameObject,
+} from "../api/backend";
 
 interface PathStackItem {
     key: number;
@@ -18,6 +22,7 @@ type ObjectExplorerContextType = {
     openPath: (pathStackItem: PathStackItem) => void;
     openStorage: (device: Device, storage: Storage) => void;
     loadObjects: (parentId: number) => Promise<void>;
+    renameObject: (objectID: number, name: string) => void;
     deleteObject: (objectID: number) => void;
 };
 
@@ -49,6 +54,25 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
             setObjects(objects);
         } catch (e) {
             console.error("Error loading objects:", e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renameObject = async (objectId: number, name: string) => {
+        if (loading) {
+            throw new Error("There is running process");
+        }
+
+        if (!selectedDevice || !selectedStorage) {
+            throw new Error("Selected device or storage is not set");
+        }
+
+        try {
+            await handleRenameObject(selectedDevice.serial_number, objectId, name);
+            loadObjects(pathStack[pathStack.length - 1].key);
+        } catch (e) {
+            console.error("Error deleting object:", e);
         } finally {
             setLoading(false);
         }
@@ -122,6 +146,7 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
                     setSelectedStorage(storage);
                 },
                 loadObjects,
+                renameObject,
                 deleteObject,
             }}
         >

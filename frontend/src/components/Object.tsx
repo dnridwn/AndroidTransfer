@@ -6,6 +6,7 @@ import {
     FileText,
     Folder,
     Info,
+    SquarePen,
     Trash,
 } from "lucide-react";
 import { MouseEvent, ReactElement, useEffect, useRef, useState } from "react";
@@ -72,7 +73,7 @@ const ICON_BY_FORMAT: Record<Object["format"], ReactElement> = {
 interface ObjectComponentProps {
     object: Object;
     onDoubleClick: (object: Object) => void;
-    onActionClick: (action: "INFO" | "DELETE", object: Object) => void;
+    onActionClick: (action: "INFO" | "RENAME" | "DELETE", object: Object) => void;
 }
 
 export const ObjectComponent = ({
@@ -154,6 +155,12 @@ export const ObjectComponent = ({
                     onClick={() => onActionClick("INFO", object)}
                 >
                     <Info size={14} /> Info
+                </button>
+                <button
+                    className="flex items-center gap-1 py-2 px-3 cursor-pointer text-sm text-left text-gray-600 w-full hover:bg-gray-100 hover:text-gray-900"
+                    onClick={() => onActionClick("RENAME", object)}
+                >
+                    <SquarePen size={14} /> Rename
                 </button>
                 <button
                     className="flex items-center gap-1 py-2 px-3 cursor-pointer text-sm text-left text-gray-600 w-full hover:bg-gray-100 hover:text-gray-900"

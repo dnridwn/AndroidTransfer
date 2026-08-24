@@ -186,3 +186,14 @@ func (d *Device) DeleteObject(ctx context.Context, objectID uint32) error {
 
 	return d.h.DeleteObject(objectID)
 }
+
+func (d *Device) RenameObject(ctx context.Context, objectID uint32, name string) error {
+	_ = d.OpenSession(ctx)
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	return d.h.SetObjectPropValue(objectID, mtpdriver.OPC_ObjectFileName, &mtpdriver.StringValue{
+		Value: name,
+	})
+}

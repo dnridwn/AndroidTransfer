@@ -1,4 +1,4 @@
-import { CircleQuestionMark, HardDrive, Info, Laptop } from "lucide-react";
+import { CircleQuestionMark, HardDrive, Info, Laptop, SquarePen } from "lucide-react";
 import { DeviceListProvider, useDeviceList } from "./hooks/useDeviceList";
 import { ObjectExplorerProvider, useObjectExplorer } from "./hooks/useObjectExplorer";
 import { useState } from "react";
@@ -64,11 +64,14 @@ const MainView = () => {
         openPath,
         objects,
         loading,
+        renameObject,
         deleteObject,
     } = useObjectExplorer();
     const [focusObject, setFocusObject] = useState<Object | null>(null);
     const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState(false);
     const [modalDeleteObjectVisible, setModalDeleteObjectVisible] = useState(false);
+    const [modalRenameObjectVisible, setModalRenameObjectVisible] = useState(false);
+    const [newObjectName, setNewObjectName] = useState<string>("");
 
     return (
         <div className="w-[calc(100%-300px)] h-full overflow-y-scroll bg-white">
@@ -105,13 +108,17 @@ const MainView = () => {
                                         });
                                     }}
                                     onActionClick={(action, object) => {
+                                        setFocusObject(object);
                                         if (action === "INFO") {
-                                            setFocusObject(object);
                                             setModalObjectInfoVisible(true);
                                         }
 
+                                        if (action === "RENAME") {
+                                            setNewObjectName(object.name);
+                                            setModalRenameObjectVisible(true);
+                                        }
+
                                         if (action === "DELETE") {
-                                            setFocusObject(object);
                                             setModalDeleteObjectVisible(true);
                                         }
                                     }}
@@ -200,6 +207,51 @@ const MainView = () => {
                                 }}
                             >
                                 Delete
+                            </button>
+                        </div>
+                    </ModalComponent>
+
+                    <ModalComponent
+                        visible={modalRenameObjectVisible}
+                        title={
+                            <div className="flex justify-center items-center gap-2 text-sm">
+                                <SquarePen size={18} /> Rename
+                            </div>
+                        }
+                        onClose={() => {
+                            setFocusObject(null);
+                            setModalRenameObjectVisible(false);
+                        }}
+                    >
+                        <div className="mb-5">
+                            <input
+                                type="text"
+                                className="w-full border border-2 border-gray-300 rounded-lg py-1 px-2 text-gray-700 outline-none text-sm focus:border-gray-400"
+                                value={newObjectName}
+                                onChange={(e) => setNewObjectName(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex justify-end items-center gap-2">
+                            <button
+                                className="text-sm py-1 px-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300"
+                                onClick={() => {
+                                    setFocusObject(null);
+                                    setModalRenameObjectVisible(false);
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="text-sm py-1 px-2 rounded-md cursor-pointer bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                                disabled={!newObjectName}
+                                onClick={() => {
+                                    focusObject &&
+                                        newObjectName &&
+                                        renameObject(focusObject.id, newObjectName);
+                                    setModalRenameObjectVisible(false);
+                                }}
+                            >
+                                Rename
                             </button>
                         </div>
                     </ModalComponent>

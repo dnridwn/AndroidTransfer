@@ -105,3 +105,12 @@ func (a *App) DeleteObject(deviceSerialNumber string, objectID uint32) error {
 
 	return device.DeleteObject(a.ctx, objectID)
 }
+
+func (a *App) RenameObject(deviceSerialNumber string, objectID uint32, name string) error {
+	device, ok := a.devicePool[deviceSerialNumber]
+	if !ok {
+		return errors.New("no device found")
+	}
+
+	return device.RenameObject(a.ctx, objectID, name)
+}

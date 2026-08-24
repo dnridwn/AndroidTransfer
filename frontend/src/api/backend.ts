@@ -3,6 +3,7 @@ import {
     GetStorages,
     GetObjects,
     DeleteObject,
+    RenameObject,
 } from "../../wailsjs/go/main/App";
 import { Device } from "../types/device";
 import { Storage } from "../types/storage";
@@ -75,6 +76,24 @@ export const handleGetObjectList = async (
     } catch (e: unknown) {
         if (e instanceof Error) {
             throw new Error("Failed to get object list: " + e.message);
+        } else {
+            throw new Error("An unexpected error occured: ", {
+                cause: e,
+            });
+        }
+    }
+};
+
+export const handleRenameObject = async (
+    deviceSerialNumber: string,
+    objectID: number,
+    name: string
+) => {
+    try {
+        await RenameObject(deviceSerialNumber, objectID, name);
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error("Failed to rename object: " + e.message);
         } else {
             throw new Error("An unexpected error occured: ", {
                 cause: e,

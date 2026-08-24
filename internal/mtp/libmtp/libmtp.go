@@ -45,9 +45,5 @@ func (l *libMTP) getDevices() ([]*mtpdriver.Device, error) {
 	defer l.mu.Unlock()
 
 	foundDevices, err := mtpdriver.FindDevices(usb.NewContext())
-	if err != nil {
-		return nil, err
-	}
-
-	return foundDevices, nil
+	return foundDevices, err
 }
