@@ -1,4 +1,11 @@
-import { CircleQuestionMark, HardDrive, Info, Laptop, SquarePen } from "lucide-react";
+import {
+    CircleQuestionMark,
+    FileX,
+    HardDrive,
+    Info,
+    Laptop,
+    SquarePen,
+} from "lucide-react";
 import { DeviceListProvider, useDeviceList } from "./hooks/useDeviceList";
 import { ObjectExplorerProvider, useObjectExplorer } from "./hooks/useObjectExplorer";
 import { useState } from "react";
@@ -8,6 +15,7 @@ import { ObjectComponent } from "./components/Object";
 import { ModalComponent } from "./components/Modal";
 import { formatByteHumanReadable } from "./utils/format";
 import { Object } from "./types/object";
+import { EmptyComponent } from "./components/Empty";
 
 function App() {
     return (
@@ -96,7 +104,16 @@ const MainView = () => {
 
                     {loading && <LoadingComponent />}
 
-                    {!loading && (
+                    {!loading && !objects.length && (
+                        <div className="h-[calc(100vh-44px)]">
+                            <EmptyComponent
+                                icon={<FileX size={64} />}
+                                title="Folder empty"
+                            />
+                        </div>
+                    )}
+
+                    {!loading && !!objects.length && (
                         <div className="grid grid-cols-5 gap-2 p-3">
                             {objects.map((object) => (
                                 <ObjectComponent
