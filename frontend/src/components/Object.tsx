@@ -81,7 +81,11 @@ export const ObjectComponent = ({
     onDoubleClick,
     onActionClick,
 }: ObjectComponentProps) => {
-    const [contextMenu, setContextMenu] = useState({
+    const [contextMenu, setContextMenu] = useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+    }>({
         visible: false,
         x: 0,
         y: 0,

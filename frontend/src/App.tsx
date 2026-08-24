@@ -68,9 +68,11 @@ const MainView = () => {
         deleteObject,
     } = useObjectExplorer();
     const [focusObject, setFocusObject] = useState<Object | null>(null);
-    const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState(false);
-    const [modalDeleteObjectVisible, setModalDeleteObjectVisible] = useState(false);
-    const [modalRenameObjectVisible, setModalRenameObjectVisible] = useState(false);
+    const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState<boolean>(false);
+    const [modalDeleteObjectVisible, setModalDeleteObjectVisible] =
+        useState<boolean>(false);
+    const [modalRenameObjectVisible, setModalRenameObjectVisible] =
+        useState<boolean>(false);
     const [newObjectName, setNewObjectName] = useState<string>("");
 
     return (
