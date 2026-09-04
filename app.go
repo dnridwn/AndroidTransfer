@@ -114,3 +114,12 @@ func (a *App) RenameObject(deviceSerialNumber string, objectID uint32, name stri
 
 	return device.RenameObject(a.ctx, objectID, name)
 }
+
+func (a *App) PutObjects(deviceSerialNumber string, storageID, parentID uint32, paths []string) error {
+	device, ok := a.devicePool[deviceSerialNumber]
+	if !ok {
+		return errors.New("no device found")
+	}
+
+	return device.PutObjects(a.ctx, storageID, parentID, paths)
+}

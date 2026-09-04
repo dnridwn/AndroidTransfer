@@ -27,6 +27,10 @@ func main() {
 		Width:         1024,
 		Height:        768,
 		DisableResize: true,
+		DragAndDrop: &options.DragAndDrop{
+			EnableFileDrop:     true,
+			DisableWebViewDrop: false,
+		},
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

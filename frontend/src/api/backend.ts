@@ -4,6 +4,7 @@ import {
     GetObjects,
     DeleteObject,
     RenameObject,
+    PutObjects,
 } from "../../wailsjs/go/main/App";
 import { Device } from "../types/device";
 import { Storage } from "../types/storage";
@@ -111,6 +112,25 @@ export const handleDeleteObject = async (
     } catch (e) {
         if (e instanceof Error) {
             throw new Error("Failed to delete object: " + e.message);
+        } else {
+            throw new Error("An unexpected error occured: ", {
+                cause: e,
+            });
+        }
+    }
+};
+
+export const handlePutObjects = async (
+    deviceSerialNumber: string,
+    storageID: number,
+    parentID: number,
+    paths: string[]
+) => {
+    try {
+        await PutObjects(deviceSerialNumber, storageID, parentID, paths);
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error("Failed to put objects: " + e.message);
         } else {
             throw new Error("An unexpected error occured: ", {
                 cause: e,

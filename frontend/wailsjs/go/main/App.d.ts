@@ -10,4 +10,6 @@ export function GetObjects(arg1:string,arg2:number,arg3:number):Promise<Array<ma
 
 export function GetStorages(arg1:string):Promise<Array<main.StorageOutput>>;
 
+export function PutObjects(arg1:string,arg2:number,arg3:number,arg4:Array<string>):Promise<void>;
+
 export function RenameObject(arg1:string,arg2:number,arg3:string):Promise<void>;

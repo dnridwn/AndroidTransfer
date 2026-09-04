@@ -16,6 +16,7 @@ import { ModalComponent } from "./components/Modal";
 import { formatByteHumanReadable } from "./utils/format";
 import { Object } from "./types/object";
 import { EmptyComponent } from "./components/Empty";
+import { DropZoneComponent } from "./components/DropZone";
 
 function App() {
     return (
@@ -74,6 +75,7 @@ const MainView = () => {
         loading,
         renameObject,
         deleteObject,
+        putObjects,
     } = useObjectExplorer();
     const [focusObject, setFocusObject] = useState<Object | null>(null);
     const [modalObjectInfoVisible, setModalObjectInfoVisible] = useState<boolean>(false);
@@ -102,49 +104,54 @@ const MainView = () => {
                         />
                     </div>
 
-                    {loading && <LoadingComponent />}
+                    <DropZoneComponent
+                        className="h-[calc(100%-44px)]"
+                        onDrop={putObjects}
+                    >
+                        {loading && <LoadingComponent />}
 
-                    {!loading && !objects.length && (
-                        <div className="h-[calc(100vh-44px)]">
-                            <EmptyComponent
-                                icon={<FileX size={64} />}
-                                title="Folder empty"
-                            />
-                        </div>
-                    )}
-
-                    {!loading && !!objects.length && (
-                        <div className="grid grid-cols-5 gap-2 p-3">
-                            {objects.map((object) => (
-                                <ObjectComponent
-                                    key={object.id}
-                                    object={object}
-                                    onDoubleClick={(object) => {
-                                        if (object.format !== "Folder") return;
-                                        openPath({
-                                            key: object.id,
-                                            name: object.name,
-                                        });
-                                    }}
-                                    onActionClick={(action, object) => {
-                                        setFocusObject(object);
-                                        if (action === "INFO") {
-                                            setModalObjectInfoVisible(true);
-                                        }
-
-                                        if (action === "RENAME") {
-                                            setNewObjectName(object.name);
-                                            setModalRenameObjectVisible(true);
-                                        }
-
-                                        if (action === "DELETE") {
-                                            setModalDeleteObjectVisible(true);
-                                        }
-                                    }}
+                        {!loading && !objects.length && (
+                            <div className="h-full">
+                                <EmptyComponent
+                                    icon={<FileX size={64} />}
+                                    title="Folder empty"
                                 />
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                        )}
+
+                        {!loading && !!objects.length && (
+                            <div className="grid grid-cols-5 gap-2 p-3">
+                                {objects.map((object) => (
+                                    <ObjectComponent
+                                        key={object.id}
+                                        object={object}
+                                        onDoubleClick={(object) => {
+                                            if (object.format !== "Folder") return;
+                                            openPath({
+                                                key: object.id,
+                                                name: object.name,
+                                            });
+                                        }}
+                                        onActionClick={(action, object) => {
+                                            setFocusObject(object);
+                                            if (action === "INFO") {
+                                                setModalObjectInfoVisible(true);
+                                            }
+
+                                            if (action === "RENAME") {
+                                                setNewObjectName(object.name);
+                                                setModalRenameObjectVisible(true);
+                                            }
+
+                                            if (action === "DELETE") {
+                                                setModalDeleteObjectVisible(true);
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </DropZoneComponent>
 
                     <ModalComponent
                         visible={modalObjectInfoVisible}

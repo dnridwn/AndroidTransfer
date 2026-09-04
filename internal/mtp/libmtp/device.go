@@ -4,6 +4,9 @@ import (
 	"AndroidTransfer/internal/mtp"
 	"cmp"
 	"context"
+	"math"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"sync"
@@ -196,4 +199,90 @@ func (d *Device) RenameObject(ctx context.Context, objectID uint32, name string)
 	return d.h.SetObjectPropValue(objectID, mtpdriver.OPC_ObjectFileName, &mtpdriver.StringValue{
 		Value: name,
 	})
+}
+
+func (d *Device) PutObjects(ctx context.Context, storageID, parentID uint32, paths []string) error {
+	_ = d.OpenSession(ctx)
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	return d.putObjects(ctx, storageID, parentID, paths)
+}
+
+func (d *Device) putObjects(ctx context.Context, storageID, parentID uint32, paths []string) error {
+	if parentID == 0 {
+		parentID = mtpdriver.GOH_ROOT_PARENT
+	}
+
+	type fileRefs struct {
+		file     *os.File
+		fileInfo os.FileInfo
+	}
+	refs := []fileRefs{}
+	defer func() {
+		for _, ref := range refs {
+			ref.file.Close()
+		}
+	}()
+
+	for _, path := range paths {
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+
+		fileInfo, err := file.Stat()
+		if err != nil {
+			return err
+		}
+
+		refs = append(refs, fileRefs{
+			file,
+			fileInfo,
+		})
+	}
+
+	for _, ref := range refs {
+		isDir := ref.fileInfo.IsDir()
+		objectFormat := uint16(mtpdriver.OFC_Undefined)
+		if isDir {
+			objectFormat = mtpdriver.OFC_Association
+		}
+
+		size := uint32(min(ref.fileInfo.Size(), math.MaxUint32))
+		objectInfo := mtpdriver.ObjectInfo{
+			Filename:         filepath.Base(ref.file.Name()),
+			CompressedSize:   size,
+			ObjectFormat:     objectFormat,
+			ModificationDate: ref.fileInfo.ModTime(),
+		}
+
+		_, _, objectID, err := d.h.SendObjectInfo(storageID, parentID, &objectInfo)
+		if err != nil {
+			return err
+		}
+
+		if !ref.fileInfo.IsDir() {
+			if err := d.h.SendObject(ref.file, ref.fileInfo.Size()); err != nil {
+				return err
+			}
+		} else {
+			entries, err := os.ReadDir(ref.file.Name())
+			if err != nil {
+				return err
+			}
+
+			entriesNames := []string{}
+			for _, entry := range entries {
+				entriesNames = append(entriesNames, filepath.Join(ref.file.Name(), entry.Name()))
+			}
+
+			if err := d.putObjects(ctx, storageID, objectID, entriesNames); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

@@ -11,4 +11,5 @@ type MTPDevice interface {
 	GetObjects(ctx context.Context, storageID, parentID uint32) ([]MTPObject, error)
 	DeleteObject(ctx context.Context, objectID uint32) error
 	RenameObject(ctx context.Context, objectID uint32, name string) error
+	PutObjects(ctx context.Context, storageID, parentID uint32, paths []string) error
 }

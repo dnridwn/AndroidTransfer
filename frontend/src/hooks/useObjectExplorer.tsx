@@ -5,6 +5,7 @@ import { Storage } from "../types/storage";
 import {
     handleDeleteObject,
     handleGetObjectList,
+    handlePutObjects,
     handleRenameObject,
 } from "../api/backend";
 
@@ -24,6 +25,7 @@ type ObjectExplorerContextType = {
     loadObjects: (parentId: number) => Promise<void>;
     renameObject: (objectID: number, name: string) => void;
     deleteObject: (objectID: number) => void;
+    putObjects: (paths: string[]) => void;
 };
 
 const ObjectExplorerContext = createContext<ObjectExplorerContextType | null>(null);
@@ -97,6 +99,30 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
         }
     };
 
+    const putObjects = async (paths: string[]) => {
+        if (loading) {
+            throw new Error("There is running process");
+        }
+
+        if (!selectedDevice || !selectedStorage) {
+            throw new Error("Selected device or storage is not set");
+        }
+
+        try {
+            await handlePutObjects(
+                selectedDevice.serial_number,
+                selectedStorage.id,
+                pathStack[pathStack.length - 1].key,
+                paths
+            );
+            loadObjects(pathStack[pathStack.length - 1].key);
+        } catch (e) {
+            console.error("Error deleting object:", e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const openPath = (pathStackItem: PathStackItem) => {
         const existingIndex = pathStack.findIndex(
             (item) => item.key === pathStackItem.key
@@ -148,6 +174,7 @@ export function ObjectExplorerProvider({ children }: { children: React.ReactNode
                 loadObjects,
                 renameObject,
                 deleteObject,
+                putObjects,
             }}
         >
             {children}
